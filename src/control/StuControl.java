@@ -59,14 +59,18 @@ public class StuControl implements Control {
     }
 
     @Override
-    public void updata(Object _if, Object _new) {
-
+    public boolean update(Object _if, Object _new) throws SQLException {
+        Student newStudent = (Student) _new;
+        String sql = "update Students set name=?,sex=?,brithday=? where sno=?";
+        PreparedStatement per = con.prepareStatement(sql);
+        per.setString(1, newStudent.getName());
+        per.setString(2, newStudent.getSex());
+        per.setDate(3, Date.Format_Date(newStudent.getBrithday()));
+        return per.execute();
     }
 
     @Override
-    public void delete(Object o) {
-
+    public boolean delete(Object o) {
+        return false;
     }
-
-
 }

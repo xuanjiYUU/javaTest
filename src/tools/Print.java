@@ -1,11 +1,13 @@
 package tools;
-
 import java.util.List;
 
-public class Print {
+public class Print{
     public static void PrintArray(List ls) {
-        for (int i = 0; i < ls.size(); i++) {
-            System.out.println(ls.get(i));
+        if(ls.size()==0){
+            return ;
+        }
+        for (Object l : ls) {
+            System.out.println(l);
         }
     }
 }

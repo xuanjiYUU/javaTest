@@ -8,7 +8,7 @@ public interface Control {
 
     void insert(Object o) throws SQLException;
 
-    void updata(Object _if, Object _new);
+    boolean update(Object _if, Object _new) throws SQLException;
 
-    void delete(Object o);
+    boolean delete(Object o);
 }

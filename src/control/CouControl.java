@@ -41,12 +41,14 @@ public class CouControl implements Control {
     }
 
     @Override
-    public void updata(Object _if, Object _new) {
-
+    public boolean update(Object _if, Object _new) throws SQLException {
+        return false;
     }
 
     @Override
-    public void delete(Object o) {
-
+    public boolean delete(Object o) {
+        return false;
     }
+
+
 }

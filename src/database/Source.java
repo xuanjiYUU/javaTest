@@ -13,7 +13,7 @@ public class Source {
         getConnection(); //初始化配置
         con=dataSource.getConnection();
     }
-    public void getConnection() throws PropertyVetoException, SQLException {
+    public void getConnection() throws PropertyVetoException {
         dataSource = new ComboPooledDataSource();
         //对池进行四大参数的配置
         dataSource.setDriverClass("com.microsoft.sqlserver.jdbc.SQLServerDriver");

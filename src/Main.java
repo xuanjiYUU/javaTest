@@ -5,13 +5,10 @@ import control.StuControl;
 import entity.Course;
 import entity.Grade;
 import entity.Student;
-import tools.Date;
 import tools.Print;
 
 import java.beans.PropertyVetoException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 方法一：grade的read应同时read student
@@ -19,13 +16,17 @@ import java.util.List;
  */
 public class Main {
     public static void main(String[] args) {
+
         try {
             Control sc = StuControl.getInstance();
-            Control gc = GraControl.getInstance();
-            Control cc = CouControl.getInstance();
-            Print.PrintArray(gc.read());
-            Print.PrintArray(sc.read());
-            Print.PrintArray(cc.read());
+            GraControl gc = GraControl.getInstance();
+           // gc.insert(new Grade(1l,"JAVA",100));
+            Print.PrintArray(gc.read("南"));
+            //sc.insert(new Student(1l,1l,"南希","男","2022-11-11"));
+
+            //Print.PrintArray(sc.read(null));
+            //Print.PrintArray(sc.read(1l));
+
         } catch (PropertyVetoException e) {
             throw new RuntimeException(e);
         } catch (SQLException e) {

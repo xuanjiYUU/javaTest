@@ -10,11 +10,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
  * 学生控制
+ * 测试通过
  *
  * @author 马文涛
  * @date 2022/11/08
@@ -50,21 +53,45 @@ public class StuControl implements Control {
 
     //读取
     @Override
-    public List<Student> read() throws SQLException {
+    public List<Student> read(Object o) throws SQLException {
+        if (o == null) {
+            return read();
+        } else if (o.getClass() == Long.class) {
+            return read((long) o);
+        }
+        return null;
+    }
+
+    /**
+     * 读 委托
+     *
+     * @return {@link List}<{@link Student}>
+     * @throws SQLException sqlexception异常
+     */
+    private List<Student> read() throws SQLException {
         String sql = "select * from Students";
         PreparedStatement pre = con.prepareStatement(sql);
         ResultSet rest = pre.executeQuery();
         List<Student> students = new ArrayList<>();
         while (rest.next()) {
             Student s = new Student(rest.getInt("sno"),
+                    rest.getInt("cno"),
                     rest.getString("name"),
                     rest.getString("sex"),
                     Date.Format_String(rest.getDate("brithday")));
             students.add(s);
+
         }
         return students;
     }
 
+    /**
+     * 读 委托
+     *
+     * @param sno sno
+     * @return {@link List}<{@link Student}>
+     * @throws SQLException sqlexception异常
+     */
     public List<Student> read(long sno) throws SQLException {
         String sql = "select * from Students where sno=?";
         PreparedStatement pre = con.prepareStatement(sql);
@@ -73,6 +100,7 @@ public class StuControl implements Control {
         List<Student> students = new ArrayList<>();
         while (rest.next()) {
             Student s = new Student(rest.getInt("sno"),
+                    rest.getInt("cno"),
                     rest.getString("name"),
                     rest.getString("sex"),
                     Date.Format_String(rest.getDate("brithday")));
@@ -94,12 +122,13 @@ public class StuControl implements Control {
      * @throws SQLException sqlexception异常
      */
     private void insert(Student s) throws SQLException {
-        String sql = "insert into Students(sno,name,sex,brithday)values(?,?,?,?)";
+        String sql = "insert into Students(sno,name,sex,brithday,cno)values(?,?,?,?,?)";
         PreparedStatement psr = con.prepareStatement(sql);
         psr.setLong(1, s.getSno());
         psr.setString(2, s.getName());
         psr.setString(3, s.getSex());
-        psr.setDate(4, Date.Format_Date(s.getBrithday()));
+        psr.setString(4, s.getBrithday());
+        psr.setLong(5, s.getCno());
         psr.execute();
     }
 
@@ -108,7 +137,7 @@ public class StuControl implements Control {
     public boolean update(Object _if, Object _new) throws SQLException {
         Student newStudent = (Student) _new;
         long sno = (long) _if;
-        return update(_if, newStudent);
+        return update(sno, newStudent);
     }
 
     /**
@@ -124,7 +153,8 @@ public class StuControl implements Control {
         PreparedStatement pre = con.prepareStatement(sql);
         pre.setString(1, _new.getName());
         pre.setString(2, _new.getSex());
-        pre.setDate(3, Date.Format_Date(_new.getBrithday()));
+        pre.setString(3, _new.getBrithday());
+        pre.setLong(4, sno);
         return pre.execute();
     }
 
@@ -142,9 +172,23 @@ public class StuControl implements Control {
      * @throws SQLException sqlexception异常
      */
     private boolean delete(long sno) throws SQLException {
-        String sql = "delete from Student where sno=?";
+        String sql = "delete from Students where sno=?";
         PreparedStatement pre = con.prepareStatement(sql);
         pre.setLong(1, sno);
         return pre.execute();
+    }
+
+    /**
+     * 映射
+     *
+     * @return {@link Map}<{@link Long}, {@link Student}>
+     * @throws SQLException sqlexception异常
+     */
+    public Map<Long, Student> mapping() throws SQLException {
+        Map<Long, Student> result = new HashMap<>();
+        for (Student s : read(null)) {
+            result.put(s.getSno(), s);
+        }
+        return result;
     }
 }

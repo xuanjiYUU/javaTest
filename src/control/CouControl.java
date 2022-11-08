@@ -12,10 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 再控制
  * 课程控制
- *
- * @author 马文涛
+ * 测试通过
+ * * @author 马文涛
  * @date 2022/11/08
  */
 public class CouControl implements Control {
@@ -38,7 +37,7 @@ public class CouControl implements Control {
     }
 
     @Override
-    public List<Course> read() throws SQLException {
+    public List<Course> read(Object o) throws SQLException {
         String sql = "select * from Courses";
         PreparedStatement pre = con.prepareStatement(sql);
         ResultSet rest = pre.executeQuery();
@@ -71,46 +70,44 @@ public class CouControl implements Control {
 
     @Override
     public boolean update(Object _if, Object _new) throws SQLException {
-        if (true) { //判断是否仍然存在课程名为_if的成绩
-            return update((String) _if, (String) _new);
-        } else {
-            return false;
-        }
-
+        //if (true) { //判断是否仍然存在课程名为_if的成绩
+            return update((Course) _if, (Course) _new);
+        //} else {
+         //   return false;
+        //}
     }
-
     /**
      * 更新的委托
-     *
      * @param _old 老
      * @param _new 新
      * @return boolean
      * @throws SQLException sqlexception异常
      */
-    private boolean update(String _old, String _new) throws SQLException {
+    private boolean update(Course _old, Course _new) throws SQLException {
         String sql = "update Courses set cname=? where cname=?";
         PreparedStatement pre = con.prepareStatement(sql);
-        pre.setString(1, _old);
-        pre.setString(2, _new);
+        pre.setString(2, _old.getCname());
+        pre.setString(1, _new.getCname());
         return pre.execute();
     }
 
     @Override
     public boolean delete(Object o) throws SQLException {
-        return delete((String) o);
+        return delete((Course) o);
     }
+
 
     /**
      * 删除的委托
      *
-     * @param cname cname
+     * @param g g
      * @return boolean
-     * @throws SQLException sqlexception异常
+     * @throws SQLException
      */
-    public boolean delete(String cname) throws SQLException {
+    public boolean delete(Course g) throws SQLException {
         String sql = "delete from Courses where cname=?";
         PreparedStatement pre = con.prepareStatement(sql);
-        pre.setString(1, cname);
+        pre.setString(1, g.getCname());
         return pre.execute();
     }
 

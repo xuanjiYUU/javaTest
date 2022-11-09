@@ -8,19 +8,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Student {
-    @ExcelProperty("姓名")
     private String name;
-    @ExcelProperty("生日")
     private String brithday;
-    @ExcelProperty("性别")
     private String sex;
-    @ExcelProperty("学号")
     private long sno;
-    @ExcelProperty("班级")
     private long cno;
-//    @ExcelProperty("成绩")
-    @ExcelProperty(value = "成绩")
     private List<Grade> grades;
+    /**
+     * 该属性对数据库不可见
+     */
+    private double sum_score;
 
     //用于删除时指定
     public Student(long sno) {
@@ -52,6 +49,18 @@ public class Student {
         this.sex = sex;
         this.brithday = brithray;
         this.grades = grades;
+        caculater_sumScore();
+    }
+
+    /**
+     * 计算总分数
+     */
+    private void caculater_sumScore() {
+        double sum = 0.0;
+        for (Grade g : grades) {
+            sum += g.getScore();
+        }
+        setSum_score(sum);
     }
 
     public String getName() {
@@ -90,10 +99,12 @@ public class Student {
     public String toString() {
         return "Student{" +
                 "name='" + name + '\'' +
-                ", sex='" + sex + '\'' +
                 ", brithday='" + brithday + '\'' +
+                ", sex='" + sex + '\'' +
                 ", sno=" + sno +
+                ", cno=" + cno +
                 ", grades=" + grades +
+                ", sum_score=" + sum_score +
                 '}';
     }
 
@@ -110,6 +121,7 @@ public class Student {
             this.grades = new ArrayList<>();
         }
         this.grades.add(g);
+        caculater_sumScore();
     }
 
     public long getCno() {
@@ -118,5 +130,26 @@ public class Student {
 
     public void setCno(long cno) {
         this.cno = cno;
+    }
+
+    public double getSum_score() {
+        return sum_score;
+    }
+
+    /**
+     * @param sum_score
+     */
+    public void setSum_score(double sum_score) {
+        this.sum_score = sum_score;
+    }
+
+    public int getScore(String cname) {
+        int result = 0;
+        for (Grade g : grades) {
+            if (g.getCname().equals(cname)) {
+                result = g.getScore();
+            }
+        }
+        return result;
     }
 }

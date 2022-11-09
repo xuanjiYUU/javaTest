@@ -1,6 +1,7 @@
 package control;
 
 import database.Source;
+import entity.Course;
 import entity.Grade;
 import entity.Student;
 import tools.mError;
@@ -56,6 +57,9 @@ public class GraControl implements Control {
         } else if (o.getClass() == Long.class) {
             return read((long) o);
         }
+//        else if (o.getClass() == Course.class) {
+//            return read((Course) o);
+//        }
         return null;
     }
 
@@ -79,10 +83,10 @@ public class GraControl implements Control {
         }
         for (Student s : map.values()) {
             if (s.getGrades() != null) { //有成绩的学生
+                s.setSum_score(readSumScore(s.getSno())); //设置总分，用于报表
                 result.add(s);
             }
         }
-
         return result;
     }
 
@@ -115,6 +119,34 @@ public class GraControl implements Control {
 
         for (Student s : map.values()) {
             if (s.getGrades() != null) { //有成绩的学生
+                s.setSum_score(readSumScore(s.getSno())); //设置总分，用于报表
+                result.add(s);
+            }
+        }
+        return result;
+    }
+
+    private List<Student> read(Course c) throws SQLException, mError {
+        String sql = "select * from Grades where cname =?";
+        PreparedStatement pre = con.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+        pre.setString(1, c.getCname());
+        ResultSet rest = pre.executeQuery();
+        List<Student> result = new ArrayList<>();
+        Map<Long, Student> map = stuControl.mapping();
+        if (!rest.next()) {
+            throw new mError("提示", c.getCname() + "课程不存在");
+        }
+        rest.beforeFirst();
+        while (rest.next()) {
+            Grade g = new Grade(rest.getLong("sno"),
+                    rest.getString("cname"),
+                    rest.getInt("score"));
+            System.out.println(g);
+            map.get(g.getSno()).addGrade(g);
+        }
+        for (Student s : map.values()) {
+            if (s.getGrades() != null) { //有成绩的学生
+                s.setSum_score(readSumScore(s.getSno())); //设置总分，用于报表
                 result.add(s);
             }
         }
@@ -147,6 +179,7 @@ public class GraControl implements Control {
         }
         for (Student s : map.values()) {
             if (s.getGrades() != null) { //有成绩的学生
+                s.setSum_score(readSumScore(s.getSno())); //设置总分，用于报表
                 result.add(s);
             }
         }
@@ -220,5 +253,24 @@ public class GraControl implements Control {
         pre.setLong(1, g.getSno());
         pre.setString(2, g.getCname());
         return pre.execute();
+    }
+    //提供外部接口
+    public double readSumScore(long sno) throws SQLException {
+        String sql = "select sum(score) as sum from Grades where sno=?";
+        PreparedStatement pre = con.prepareStatement(sql);
+        pre.setLong(1, sno);
+        ResultSet rest = pre.executeQuery();
+        rest.next();
+        return rest.getDouble("sum");
+    }
+    //提供外部接口
+    public double readClass_Course_Avg_Score(long cno, String cname) throws SQLException {
+        String sql = "select avg(score) as avg from Grades,Students where Grades.sno=Students.sno and Grades.cname=? and Students.cno=?";
+        PreparedStatement pre = con.prepareStatement(sql);
+        pre.setLong(2, cno);
+        pre.setString(1, cname);
+        ResultSet rest = pre.executeQuery();
+        rest.next();
+        return rest.getDouble("avg");
     }
 }

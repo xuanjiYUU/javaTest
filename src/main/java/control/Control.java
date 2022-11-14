@@ -1,7 +1,5 @@
 package control;
 
-import entity.Grade;
-import entity.Student;
 import tools.mError;
 
 import java.beans.PropertyVetoException;
@@ -16,10 +14,16 @@ import java.util.List;
 public interface Control {
     List read(Object o) throws SQLException, mError;
 
-    void insert(Object o) throws SQLException;
+    void insert(Object o) throws SQLException, mError;
 
     boolean update(Object _if, Object _new) throws SQLException;
 
+    /**
+     * @param o
+     * @return boolean
+     * @throws SQLException
+     * @throws PropertyVetoException
+     */
     boolean delete(Object o) throws SQLException, PropertyVetoException;
 
 }

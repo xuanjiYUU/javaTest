@@ -1,13 +1,16 @@
 package control;
 
 import database.Source;
-import entity.Course;
+import entity.Cource;
 import entity.Grade;
 import entity.Student;
 import tools.mError;
 
 import java.beans.PropertyVetoException;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -56,10 +59,9 @@ public class GraControl implements Control {
             return read((String) o);
         } else if (o.getClass() == Long.class) {
             return read((long) o);
+        } else if (o.getClass() == Cource.class) {
+            return read((Cource) o);
         }
-//        else if (o.getClass() == Course.class) {
-//            return read((Course) o);
-//        }
         return null;
     }
 
@@ -126,7 +128,7 @@ public class GraControl implements Control {
         return result;
     }
 
-    private List<Student> read(Course c) throws SQLException, mError {
+    private List<Student> read(Cource c) throws SQLException, mError {
         String sql = "select * from Grades where cname =?";
         PreparedStatement pre = con.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
         pre.setString(1, c.getCname());
@@ -151,6 +153,22 @@ public class GraControl implements Control {
             }
         }
         return result;
+    }
+
+    /**
+     * 重复查询
+     *
+     * @return {@link List}<{@link Student}>
+     * @throws SQLException sqlexception异常
+     * @throws mError       米误差
+     */
+    private boolean read(Grade g) throws SQLException, mError {
+        String sql = "select * from Grades where cname =? and sno=?";
+        PreparedStatement pre = con.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+        pre.setString(1, g.getCname());
+        pre.setLong(2, g.getSno());
+        ResultSet rest = pre.executeQuery();
+        return rest.next();
     }
 
     /**
@@ -187,7 +205,7 @@ public class GraControl implements Control {
     }
 
     @Override
-    public void insert(Object o) throws SQLException {
+    public void insert(Object o) throws SQLException, mError {
         Grade g = (Grade) o;
         insert(g);
     }
@@ -198,13 +216,17 @@ public class GraControl implements Control {
      * @param g 数据
      * @throws SQLException sqlexception异常
      */
-    private void insert(Grade g) throws SQLException {
-        String sql = "insert into Grades(sno,cname,score)values(?,?,?)";
-        PreparedStatement psr = con.prepareStatement(sql);
-        psr.setLong(1, g.getSno());
-        psr.setString(2, g.getCname());
-        psr.setInt(3, g.getScore());
-        psr.execute();
+    private void insert(Grade g) throws SQLException, mError {
+        if (read(g)) {
+            throw new mError("提示", "该成绩已存在");
+        } else {
+            String sql = "insert into Grades(sno,cname,score)values(?,?,?)";
+            PreparedStatement psr = con.prepareStatement(sql);
+            psr.setLong(1, g.getSno());
+            psr.setString(2, g.getCname());
+            psr.setInt(3, g.getScore());
+            psr.execute();
+        }
     }
 
     @Override
@@ -254,6 +276,7 @@ public class GraControl implements Control {
         pre.setString(2, g.getCname());
         return pre.execute();
     }
+
     //提供外部接口
     public double readSumScore(long sno) throws SQLException {
         String sql = "select sum(score) as sum from Grades where sno=?";
@@ -263,6 +286,7 @@ public class GraControl implements Control {
         rest.next();
         return rest.getDouble("sum");
     }
+
     //提供外部接口
     public double readClass_Course_Avg_Score(long cno, String cname) throws SQLException {
         String sql = "select avg(score) as avg from Grades,Students where Grades.sno=Students.sno and Grades.cname=? and Students.cno=?";

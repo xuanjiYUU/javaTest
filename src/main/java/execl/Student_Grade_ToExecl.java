@@ -7,7 +7,7 @@ import com.alibaba.excel.write.metadata.WriteSheet;
 import control.Control;
 import control.CouControl;
 import control.GraControl;
-import entity.Course;
+import entity.Cource;
 import entity.Grade;
 import entity.Student;
 import tools.DOUBLE;
@@ -39,12 +39,12 @@ public class Student_Grade_ToExecl {
      * @throws mError                米误差
      * @throws PropertyVetoException 财产否决例外
      */
-    public void createGrades(List<Student> ss) throws SQLException, mError, PropertyVetoException {
+    public void createGrades(List<Student> ss, int flag) throws SQLException, mError, PropertyVetoException {
         Control cc = CouControl.getInstance();
         String filename = "Grades" + System.currentTimeMillis() + ".xlsx";
-        List<Student_Grade> student_grades_desc = getAllGrades(ss, 0);
-        List<Student_SumScore> sumScores_desc = getSumCoreGrades(ss, 0).stream().toList();
-        List<Student_SumScore> class_course_avg_score_desc = getClass_Course_Avg_Score(ss,cc.read(null));
+        List<Student_Grade> student_grades_desc = getAllGrades(ss, flag);
+        List<Student_SumScore> sumScores_desc = getSumCoreGrades(ss, flag).stream().toList();
+        List<Student_SumScore> class_course_avg_score_desc = getClass_Course_Avg_Score(ss, cc.read(null), flag);
 
         try (ExcelWriter excelWriter = EasyExcel.write(filename).build()) {
             WriteSheet writeSheet = EasyExcel.writerSheet(1, "成绩").head(Student_Grade.class).build();
@@ -97,14 +97,21 @@ public class Student_Grade_ToExecl {
      * @throws SQLException          sqlexception异常
      */
     public Set<Student_SumScore> getSumCoreGrades(List<Student> students, int flag) throws PropertyVetoException, SQLException {
-        DecimalFormat df = new DecimalFormat("#0.00"); //小数位2
         Set<Student_SumScore> result = new HashSet<>();
-        GraControl gc = GraControl.getInstance();
         for (Student s : students) {
             result.add(new Student_SumScore(s.getSno(), s.getCno(), s.getName(), s.getSum_score(), DOUBLE.round(s.getSum_score() / s.getGrades().size(), 3)));
         }
         for (Student_SumScore s : result) {
             System.out.println(s);
+        }
+        if (flag == 0) {
+            result.stream().sorted((o1, o2) -> {
+                return (int) (o1.getSumScore() - o2.getSumScore());
+            });
+        } else if (flag == 1) {
+            result.stream().sorted((o1, o2) -> {
+                return (int) (o2.getSumScore() - o1.getSumScore());
+            });
         }
         return result;
     }
@@ -118,16 +125,31 @@ public class Student_Grade_ToExecl {
      * @throws PropertyVetoException 财产否决例外
      * @throws SQLException          sqlexception异常
      */
-    public List<Student_Class_Course_AvgScore> getClass_Course_Avg_Score(List<Student> ss, List<Course> cs) throws PropertyVetoException, SQLException {
+    public List<Student_Class_Course_AvgScore> getClass_Course_Avg_Score(List<Student> ss, List<Cource> cs, int flag) throws PropertyVetoException, SQLException {
         Map<String, Student_Class_Course_AvgScore> result = new HashMap<>();
         GraControl gc = GraControl.getInstance(); //使用暴露的接口查询
         for (Student s : ss) {
-            for (Course c : cs) {
-                String head = s.getName()+s.getCno() + c.getCname();
-                result.put(head, new Student_Class_Course_AvgScore(s.getSno(), s.getCno(), s.getName(), c.getCname(), s.getScore(c.getCname()), gc.readClass_Course_Avg_Score(s.getCno(), c.getCname())));
+            for (Cource c : cs) {
+                String head = s.getName() + s.getCno() + c.getCname();
+                if (s.getScore(c.getCname()) == 0) { //去除0成绩的课程
+                    continue;
+                }else{
+                    result.put(head, new Student_Class_Course_AvgScore(s.getSno(), s.getCno(), s.getName(), c.getCname(), s.getScore(c.getCname()), gc.readClass_Course_Avg_Score(s.getCno(), c.getCname())));
+                }
             }
         }
-        return result.values().stream().toList();
+        List<Student_Class_Course_AvgScore> result_temp = result.values().stream().toList();
+        List<Student_Class_Course_AvgScore> result_sort = new ArrayList<>(result_temp);
+        if (flag == 0) {
+            result_sort.sort((o1, o2) -> {
+                return (int) (o1.getClass_course_avg_scroe() - o2.getClass_course_avg_scroe());
+            });
+        } else if (flag == 1) {
+            result_sort.sort((o1, o2) -> {
+                return (int) (o2.getClass_course_avg_scroe() - o1.getClass_course_avg_scroe());
+            });
+        }
+        return result_sort;
     }
 }
 

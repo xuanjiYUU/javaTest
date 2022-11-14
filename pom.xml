@@ -19,5 +19,10 @@
             <artifactId>easyexcel</artifactId>
             <version>3.1.2</version>
         </dependency>
+        <dependency>
+            <groupId>jgoodies</groupId>
+            <artifactId>forms</artifactId>
+            <version>1.0.5</version>
+        </dependency>
     </dependencies>
 </project>

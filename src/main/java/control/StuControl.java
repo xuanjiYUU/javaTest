@@ -60,6 +60,8 @@ public class StuControl implements Control {
             return read();
         } else if (o.getClass() == Long.class) {
             return read((long) o);
+        } else if (o.getClass() == String.class) {
+            return read((String) o);
         }
         return null;
     }
@@ -80,7 +82,7 @@ public class StuControl implements Control {
                     rest.getInt("cno"),
                     rest.getString("name"),
                     rest.getString("sex"),
-                    Date.Format_String(rest.getDate("brithday")));
+                    rest.getDate("brithday").toString());
             students.add(s);
 
         }
@@ -109,7 +111,28 @@ public class StuControl implements Control {
                     rest.getInt("cno"),
                     rest.getString("name"),
                     rest.getString("sex"),
-                    Date.Format_String(rest.getDate("brithday")));
+                    rest.getDate("brithday").toString());
+            students.add(s);
+        }
+        return students;
+    }
+
+    private List<Student> read(String name) throws SQLException, mError {
+        StringBuffer _sql = new StringBuffer("select * from Students where name like '");
+        _sql.append(name + "%" + "'");
+        PreparedStatement pre = con.prepareStatement(_sql.toString(), ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+        ResultSet rest = pre.executeQuery();
+        List<Student> students = new ArrayList<>();
+        if (!rest.next()) {
+            throw new mError("提示", "姓名不存在");
+        }
+        rest.beforeFirst();
+        while (rest.next()) {
+            Student s = new Student(rest.getInt("sno"),
+                    rest.getInt("cno"),
+                    rest.getString("name"),
+                    rest.getString("sex"),
+                    rest.getDate("brithday").toString());
             students.add(s);
         }
         return students;
@@ -170,9 +193,10 @@ public class StuControl implements Control {
         if (o.getClass() == Student.class) {
             Student s = (Student) o;
             return delete(s);
-        } else if (o.getClass() == Long.class) {
-            delete((long) o);
         }
+//        else if (o.getClass() == Long.class) {
+//            delete((long) o);
+//        }
         return true;
     }
 
@@ -211,7 +235,7 @@ public class StuControl implements Control {
      */
     public Map<Long, Student> mapping() throws SQLException, mError {
         Map<Long, Student> result = new HashMap<>();
-        for (Student s : read(null)) {
+        for (Student s : read()) {
             result.put(s.getSno(), s);
         }
         return result;

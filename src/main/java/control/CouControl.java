@@ -1,7 +1,7 @@
 package control;
 
 import database.Source;
-import entity.Course;
+import entity.Cource;
 
 import java.beans.PropertyVetoException;
 import java.sql.Connection;
@@ -37,21 +37,21 @@ public class CouControl implements Control {
     }
 
     @Override
-    public List<Course> read(Object o) throws SQLException {
+    public List<Cource> read(Object o) throws SQLException {
         String sql = "select * from Courses";
         PreparedStatement pre = con.prepareStatement(sql);
         ResultSet rest = pre.executeQuery();
-        List<Course> courses = new ArrayList<>();
+        List<Cource> cours = new ArrayList<>();
         while (rest.next()) {
-            Course c = new Course(rest.getString("cname"));
-            courses.add(c);
+            Cource c = new Cource(rest.getString("cname"));
+            cours.add(c);
         }
-        return courses;
+        return cours;
     }
 
     @Override
     public void insert(Object o) throws SQLException {
-        Course c = (Course) o;
+        Cource c = (Cource) o;
         insert(c);
     }
 
@@ -61,7 +61,7 @@ public class CouControl implements Control {
      * @param c 数据
      * @throws SQLException sqlexception异常
      */
-    private void insert(Course c) throws SQLException {
+    private void insert(Cource c) throws SQLException {
         String sql = "insert into Courses(cname)values(?)";
         PreparedStatement psr = con.prepareStatement(sql);
         psr.setString(1, c.getCname());
@@ -71,7 +71,7 @@ public class CouControl implements Control {
     @Override
     public boolean update(Object _if, Object _new) throws SQLException {
         //if (true) { //判断是否仍然存在课程名为_if的成绩
-            return update((Course) _if, (Course) _new);
+            return update((Cource) _if, (Cource) _new);
         //} else {
          //   return false;
         //}
@@ -83,7 +83,7 @@ public class CouControl implements Control {
      * @return boolean
      * @throws SQLException sqlexception异常
      */
-    private boolean update(Course _old, Course _new) throws SQLException {
+    private boolean update(Cource _old, Cource _new) throws SQLException {
         String sql = "update Courses set cname=? where cname=?";
         PreparedStatement pre = con.prepareStatement(sql);
         pre.setString(2, _old.getCname());
@@ -93,7 +93,7 @@ public class CouControl implements Control {
 
     @Override
     public boolean delete(Object o) throws SQLException {
-        return delete((Course) o);
+        return delete((Cource) o);
     }
 
 
@@ -104,7 +104,7 @@ public class CouControl implements Control {
      * @return boolean
      * @throws SQLException
      */
-    public boolean delete(Course g) throws SQLException {
+    public boolean delete(Cource g) throws SQLException {
         String sql = "delete from Courses where cname=?";
         PreparedStatement pre = con.prepareStatement(sql);
         pre.setString(1, g.getCname());

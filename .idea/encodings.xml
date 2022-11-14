@@ -2,6 +2,18 @@
 <project version="4">
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/GUI/Course/CourceAddFrame.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/GUI/Course/CourceChange.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/GUI/Course/CourceManager.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/GUI/Grade/GradeAddFrame.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/java/GUI/Grade/GradeAddFrame.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/GUI/Grade/TestManager.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/GUI/LoginClass.java" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/src/main/java/GUI/LoginFrame.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/GUI/MainFrame.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/GUI/Student/StudentChange.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/GUI/Student/StudentInfoAddFrame.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/GUI/Student/StudentManager.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java/Main.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java/control/Control.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java/control/CouControl.java" charset="UTF-8" />
